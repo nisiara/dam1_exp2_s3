@@ -19,5 +19,5 @@ dependencyResolutionManagement {
   }
 }
 
-rootProject.name = "dam1-exp2-s2"
+rootProject.name = "dam1-exp2-s3"
 include(":app")
