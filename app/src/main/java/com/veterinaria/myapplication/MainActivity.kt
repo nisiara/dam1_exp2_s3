@@ -40,10 +40,10 @@ import kotlinx.coroutines.launch
 object VeterinariaRoutes {
 	const val SPLASH = "splash"
 	const val BIENVENIDA = "Bienvenida"
-  const val TUTOR = "tutor"
-  const val MASCOTA = "mascota"
-  const val CONSULTA = "consulta"
-  const val RESUMEN_CONSULTA = "resumenConsulta"
+	const val TUTOR = "tutor"
+	const val MASCOTA = "mascota"
+	const val CONSULTA = "consulta"
+	const val RESUMEN_CONSULTA = "resumenConsulta"
 	
 	
 	// Flujo de Farmacia
@@ -52,29 +52,29 @@ object VeterinariaRoutes {
 	const val RESUMEN_FARMACIA = "resumenFarmacia"
 }
 class MainActivity : ComponentActivity() {
-  override fun onCreate(savedInstanceState: Bundle?) {
-    super.onCreate(savedInstanceState)
+	override fun onCreate(savedInstanceState: Bundle?) {
+		super.onCreate(savedInstanceState)
 		enableEdgeToEdge()
-    setContent {
-      // Tema del proyecto
-      VeterinariaTheme {
-        // Surface es el contenedor principal de la UI
-        Surface(
-          modifier = Modifier.fillMaxSize(),
-          color = MaterialTheme.colorScheme.background
-        ) {
-          VeterinariaApp()
+		setContent {
+			// Tema del proyecto
+			VeterinariaTheme {
+				// Surface es el contenedor principal de la UI
+				Surface(
+					modifier = Modifier.fillMaxSize(),
+					color = MaterialTheme.colorScheme.background
+				) {
+					VeterinariaApp()
 					
-        }
-      }
-    }
-  }
+				}
+			}
+		}
+	}
 }
 
 @Composable
 fun VeterinariaApp() {
-  // 1. Inicializar el controlador de navegación
-  val navController = rememberNavController()
+	// 1. Inicializar el controlador de navegación
+	val navController = rememberNavController()
 	
 	// Determinar la ruta actual para el ítem seleccionado en el Drawer
 	val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -88,13 +88,13 @@ fun VeterinariaApp() {
 	val onOpenDrawer: () -> Unit = {
 		scope.launch { drawerState.open() }
 	}
-
-  // 3. Crear una única instancia del ViewModel para toda la navegación (Scoped ViewModel)
-  // Esta instancia sobrevive a los cambios de configuración.
+	
+	// 3. Crear una única instancia del ViewModel para toda la navegación (Scoped ViewModel)
+	// Esta instancia sobrevive a los cambios de configuración.
 	// El ViewModel de Consulta solo gestiona el flujo de Consultas
-  val consultaViewModel: ConsultaViewModel = viewModel()
+	val consultaViewModel: ConsultaViewModel = viewModel()
 	val farmaciaViewModel: FarmaciaViewModel = viewModel()
-
+	
 	// La app completa está envuelta en el ModalNavigationDrawer
 	ModalNavigationDrawer(
 		drawerState = drawerState,
@@ -116,10 +116,10 @@ fun VeterinariaApp() {
 		NavHost(
 			navController = navController,
 			startDestination = VeterinariaRoutes.SPLASH,
-			enterTransition = { fadeIn(animationSpec = tween(1000)) },
-			exitTransition = { fadeOut(animationSpec = tween(1000)) },
-			popEnterTransition = { fadeIn(animationSpec = tween(1000)) },
-			popExitTransition = { fadeOut(animationSpec = tween(1000)) }
+			enterTransition = { fadeIn(animationSpec = tween(1500)) },
+			exitTransition = { fadeOut(animationSpec = tween(1500)) },
+			popEnterTransition = { fadeIn(animationSpec = tween(1500)) },
+			popExitTransition = { fadeOut(animationSpec = tween(1500)) }
 		) {
 			
 			// --- 0. SPLASH SCREEN (NUEVA IMPLEMENTACIÓN) ---
@@ -153,7 +153,7 @@ fun VeterinariaApp() {
 				)
 				
 			}
-	
+			
 			// --- 3. MASCOTA SCREEN ---
 			composable(VeterinariaRoutes.MASCOTA) {
 				MascotaScreen(
@@ -163,7 +163,7 @@ fun VeterinariaApp() {
 					onOpenDrawer = onOpenDrawer
 				)
 			}
-	
+			
 			// --- 4. CONSULTA SCREEN  ---
 			composable(VeterinariaRoutes.CONSULTA) {
 				ConsultaScreen(
@@ -173,7 +173,7 @@ fun VeterinariaApp() {
 					onOpenDrawer = onOpenDrawer
 				)
 			}
-	
+			
 			// --- 5. RESUMEN SCREEN ---
 			composable(VeterinariaRoutes.RESUMEN_CONSULTA) {
 				ResumenScreen(
