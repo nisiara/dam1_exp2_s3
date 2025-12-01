@@ -74,20 +74,20 @@ class ConsultaViewModel : ViewModel() {
 
 	// --- ESTADO DE LOS ERRORES PARA LA UI ---
 
-	/**
+	/*
 	 * Almacena el mensaje de error para el campo de teléfono. Si es `null`, no hay error.
 	 * La UI leerá este estado para decidir si debe mostrar un mensaje de error y pintar el campo en rojo.
 	 */
 	var errorTelefono by mutableStateOf<String?>(null)
 		private set
 
-	/**
+	/*
 	 * Almacena el mensaje de error para el campo de email. Si es `null`, no hay error.
 	 */
 	var errorEmail by mutableStateOf<String?>(null)
 		private set
 
-	/**
+	/*
 	 * Es una propiedad computada (`get()`). No almacena un valor, sino que lo calcula cada vez que se accede a ella.
 	 * Esto asegura que la validez del formulario siempre esté actualizada basándose en el estado más reciente
 	 * de los `inputs`. La UI usará este booleano para, por ejemplo, habilitar o deshabilitar el botón "Siguiente".
@@ -100,7 +100,7 @@ class ConsultaViewModel : ViewModel() {
 
 	// --- MANEJO DE EVENTOS (Notificados por la UI) ---
 
-	/**
+	/*
 	 * Event handler. La UI llama a esta función cuando el usuario escribe en el campo de nombre.
 	 * Encapsula la lógica de cómo debe cambiar el estado `nombreInput`.
 	 * @param newValue El nuevo texto que proviene del `OutlinedTextField` del nombre.
@@ -109,7 +109,7 @@ class ConsultaViewModel : ViewModel() {
 		nombreInput = newValue
 	}
 
-	/**
+	/*
 	 * Event handler para el campo de teléfono.
 	 * Contiene lógica de pre-validación (filtro) y validación reactiva.
 	 */
@@ -128,7 +128,7 @@ class ConsultaViewModel : ViewModel() {
 		}
 	}
 
-	/**
+	/*
 	 * Event handler para el campo de email.
 	 */
 	fun onEmailChange(newValue: String) {
@@ -143,7 +143,7 @@ class ConsultaViewModel : ViewModel() {
 		}
 	}
 
-	/**
+	/*
 	 * Acción final que se ejecuta cuando la UI notifica que el usuario ha presionado el botón de confirmación.
 	 * Orquesta la lógica de negocio final antes de dar por terminado este paso del flujo.
 	 * @return `true` si la operación fue exitosa, lo que le indica a la UI que puede proceder (navegar).

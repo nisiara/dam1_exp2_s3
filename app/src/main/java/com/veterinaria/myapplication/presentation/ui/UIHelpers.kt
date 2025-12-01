@@ -45,7 +45,7 @@ fun ResumenFarmaciaSection(title: String, content: @Composable () -> Unit) {
 			text = title,
 			style = MaterialTheme.typography.titleLarge,
 			fontWeight = FontWeight.SemiBold,
-			color = MaterialTheme.colorScheme.tertiary,
+//			color = MaterialTheme.colorScheme.tertiary,
 			modifier = Modifier.padding(bottom = 8.dp)
 		)
 		Card(

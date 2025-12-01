@@ -6,11 +6,14 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
@@ -21,22 +24,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.veterinaria.myapplication.data.TipoConsulta
 import com.veterinaria.myapplication.presentation.viewmodel.ConsultaViewModel
 
-/**
- * Pantalla para capturar los datos de la Consulta (Paso 3).
- * Permite elegir el tipo de consulta, la hora y muestra el veterinario asignado.
- *
- * @param onNextClick Función de navegación a la siguiente pantalla (ResumenScreen).
- * @param onBackClick Función de navegación para volver a la pantalla de Mascota.
- * @param viewModel La instancia compartida de ConsultaViewModel.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConsultaScreen(
 	onNextClick: () -> Unit,
 	onBackClick: () -> Unit,
+	onOpenDrawer: () -> Unit,
 	viewModel: ConsultaViewModel = viewModel()
 ) {
-	// Efecto secundario: Al entrar a la pantalla, inicializamos los datos (asignar veterinario)
+	var showMenu by remember { mutableStateOf(false) }
+	
 	LaunchedEffect(Unit) {
 		viewModel.inicializarDatosConsulta()
 	}
@@ -44,10 +41,35 @@ fun ConsultaScreen(
 	Scaffold(
 		topBar = {
 			TopAppBar(
-				title = { Text("Paso 3: Datos de la Consulta") },
+				title = { Text("Consulta Veterinaria", fontWeight = FontWeight(700)) },
 				navigationIcon = {
 					IconButton(onClick = onBackClick) {
 						Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+					}
+				},
+				actions = {
+					IconButton(onClick = onOpenDrawer) {
+						Icon(Icons.Default.Menu, contentDescription = "Abrir Menú")
+					}
+					IconButton(onClick = { showMenu = true }) {
+						Icon(Icons.Default.MoreVert, contentDescription = "Menú contextual")
+					}
+					DropdownMenu(
+						expanded = showMenu,
+						onDismissRequest = { showMenu = false }
+					) {
+						DropdownMenuItem(
+							text = { Text("Iniciar sesión") },
+							onClick = {
+								showMenu = false
+							}
+						)
+						DropdownMenuItem(
+							text = { Text("Configuración") },
+							onClick = {
+								showMenu = false
+							}
+						)
 					}
 				}
 			)
@@ -66,7 +88,6 @@ fun ConsultaScreen(
 				modifier = Modifier.padding(bottom = 24.dp).align(Alignment.CenterHorizontally)
 			)
 			
-			// --- Sección 1: Veterinario Asignado ---
 			Card(
 				colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
 				modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
@@ -84,7 +105,6 @@ fun ConsultaScreen(
 				}
 			}
 			
-			// --- Sección 2: Tipo de Consulta (Radio Buttons) ---
 			Text(
 				text = "Tipo de Consulta",
 				style = MaterialTheme.typography.titleSmall,
@@ -107,7 +127,7 @@ fun ConsultaScreen(
 					) {
 						RadioButton(
 							selected = (tipo == viewModel.tipoConsultaSeleccionado),
-							onClick = null // null recomendado para accesibilidad con selectable
+							onClick = null
 						)
 						Text(
 							text = tipo.descripcion,
@@ -129,7 +149,6 @@ fun ConsultaScreen(
 			
 			Spacer(modifier = Modifier.height(24.dp))
 			
-			// --- Sección 3: Hora ---
 			OutlinedTextField(
 				value = viewModel.horaInput,
 				onValueChange = viewModel::onHoraChange,
@@ -144,13 +163,12 @@ fun ConsultaScreen(
 						Text("Horas ocupadas: 10:00, 11:30, 15:00")
 					}
 				},
-				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text), // Podría ser Number o DateTime
+				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
 				modifier = Modifier.fillMaxWidth()
 			)
 			
-			Spacer(modifier = Modifier.weight(1f)) // Empuja el botón al final
+			Spacer(modifier = Modifier.weight(1f))
 			
-			// Botón Finalizar
 			Button(
 				enabled = viewModel.esConsultaValida,
 				onClick = {

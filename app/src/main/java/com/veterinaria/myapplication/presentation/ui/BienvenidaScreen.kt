@@ -1,66 +1,107 @@
 package com.veterinaria.myapplication.presentation.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.LocalPharmacy
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.veterinaria.myapplication.R
 
-/*
- * Pantalla de bienvenida que permite al usuario seleccionar el flujo de la aplicación.
- * @param onConsultaClick Navega al flujo de la Consulta (TutorScreen).
- * @param onFarmaciaClick Navega al flujo de la Farmacia (ClienteScreen).
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BienvenidaScreen(
-	onConsultaClick: () -> Unit,
-	onFarmaciaClick: () -> Unit
+//	onConsultaClick: () -> Unit,
+//	onFarmaciaClick: () -> Unit,
+	onOpenDrawer: () -> Unit
 ) {
+	var showMenu by remember { mutableStateOf(false) }
+	
 	Scaffold(
 		topBar = {
-			TopAppBar(title = { Text("Veterinaria - Servicios") })
+			TopAppBar(
+				title = { Text("Bienvenido", fontWeight = FontWeight(700)) },
+				navigationIcon = {
+					IconButton(onClick = onOpenDrawer) {
+						Icon(Icons.Default.Menu, contentDescription = "Abrir Menú")
+					}
+				},
+				actions = {
+					IconButton(onClick = { showMenu = true }) {
+						Icon(Icons.Default.MoreVert, contentDescription = "Menú contextual")
+					}
+					DropdownMenu(
+						expanded = showMenu,
+						onDismissRequest = { showMenu = false }
+					) {
+						DropdownMenuItem(
+							text = { Text("Iniciar sesión") },
+							onClick = {
+								// Acción de ejemplo
+								showMenu = false
+							}
+						)
+						DropdownMenuItem(
+							text = { Text("Configuración") },
+							onClick = {
+								// Acción de ejemplo
+								showMenu = false
+							}
+						)
+					}
+				}
+			)
 		}
 	) { paddingValues ->
 		Column(
 			modifier = Modifier
 				.fillMaxSize()
-				.padding(paddingValues)
-				.padding(32.dp),
+				.padding(paddingValues),
 			horizontalAlignment = Alignment.CenterHorizontally,
 			verticalArrangement = Arrangement.Center
 		) {
-			Text(
-				text = "¡Bienvenido! Selecciona el tipo de servicio:",
-				style = MaterialTheme.typography.headlineSmall,
-				modifier = Modifier.padding(bottom = 40.dp)
+			Image(
+				painter = painterResource(id = R.drawable.img_home),
+				contentDescription = "Imagen de bienvenida",
+				modifier = Modifier.fillMaxWidth()
 			)
-			
-			// --- Opción 1: Consulta Veterinaria ---
-			ServiceCard(
-				title = "Consulta y Cita Veterinaria",
-				description = "Registro de tutor, mascota, y cálculo de dosis/costo.",
-				icon = Icons.Default.Pets,
-				onClick = onConsultaClick,
-				color = MaterialTheme.colorScheme.primaryContainer
-			)
-			
-			Spacer(modifier = Modifier.height(32.dp))
-			
-			// --- Opción 2: Farmacia y Pedidos ---
-			ServiceCard(
-				title = "Farmacia y Pedidos de Medicamentos",
-				description = "Registro de cliente, elección de fármacos y descuentos.",
-				icon = Icons.Default.LocalPharmacy,
-				onClick = onFarmaciaClick,
-				color = MaterialTheme.colorScheme.tertiaryContainer
-			)
+//			Column(
+//			    modifier = Modifier.padding(16.dp),
+//			    horizontalAlignment = Alignment.CenterHorizontally
+//			) {
+//				Spacer(modifier = Modifier.height(40.dp))
+//
+//				ServiceCard(
+//					title = "Consulta y Cita Veterinaria",
+//					description = "Registro de tutor, mascota, y cálculo de dosis/costo.",
+//					icon = Icons.Default.Pets,
+//					onClick = onConsultaClick,
+//					color = MaterialTheme.colorScheme.primaryContainer
+//				)
+//
+//				Spacer(modifier = Modifier.height(32.dp))
+//
+//				ServiceCard(
+//					title = "Farmacia y Pedidos de Medicamentos",
+//					description = "Registro de cliente, elección de fármacos y descuentos.",
+//					icon = Icons.Default.LocalPharmacy,
+//					onClick = onFarmaciaClick,
+//					color = MaterialTheme.colorScheme.tertiaryContainer
+//				)
+//			}
 		}
 	}
 }

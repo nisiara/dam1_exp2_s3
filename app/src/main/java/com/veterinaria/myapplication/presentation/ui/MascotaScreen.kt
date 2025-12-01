@@ -5,42 +5,63 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.Cake
-import androidx.compose.material.icons.filled.Pets
-import androidx.compose.material.icons.filled.Scale
-import androidx.compose.material.icons.filled.Science
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.veterinaria.myapplication.presentation.viewmodel.ConsultaViewModel
-
-/*
- * Pantalla para capturar los datos de la Mascota (Paso 2).
- * Incluye validación de Edad (Int > 0) y Peso (Double > 0.0).
- *
- * @param onNextClick Función de navegación a la siguiente pantalla (ConsultaScreen).
- * @param onBackClick Función de navegación para volver a la pantalla del Tutor.
- * @param viewModel La instancia de ConsultaViewModel.
- */
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MascotaScreen(
 	onNextClick: () -> Unit,
 	onBackClick: () -> Unit,
+	onOpenDrawer: () -> Unit,
 	viewModel: ConsultaViewModel = viewModel()
 ) {
+	var showMenu by remember { mutableStateOf(false) }
+	
 	Scaffold(
 		topBar = {
 			TopAppBar(
-				title = { Text("Paso 2: Datos de la Mascota") },
+				title = { Text("Consulta Veterinaria", fontWeight = FontWeight(700)) },
 				navigationIcon = {
 					IconButton(onClick = onBackClick) {
 						Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+					}
+				},
+				actions = {
+					IconButton(onClick = onOpenDrawer) {
+						Icon(Icons.Default.Menu, contentDescription = "Abrir Menú")
+					}
+					IconButton(onClick = { showMenu = true }) {
+						Icon(Icons.Default.MoreVert, contentDescription = "Menú contextual")
+					}
+					DropdownMenu(
+						expanded = showMenu,
+						onDismissRequest = { showMenu = false }
+					) {
+						DropdownMenuItem(
+							text = { Text("Iniciar sesión") },
+							onClick = {
+								showMenu = false
+							}
+						)
+						DropdownMenuItem(
+							text = { Text("Configuración") },
+							onClick = {
+								showMenu = false
+							}
+						)
 					}
 				}
 			)
@@ -60,7 +81,6 @@ fun MascotaScreen(
 				modifier = Modifier.padding(bottom = 24.dp)
 			)
 			
-			// Campo: Nombre de la Mascota
 			OutlinedTextField(
 				value = viewModel.nombreMascotaInput,
 				onValueChange = viewModel::onNombreMascotaChange,
@@ -70,17 +90,41 @@ fun MascotaScreen(
 				modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
 			)
 			
-			// Campo: Especie de la Mascota
-			OutlinedTextField(
-				value = viewModel.especieMascotaInput,
-				onValueChange = viewModel::onEspecieMascotaChange,
-				label = { Text("Especie (Ej: Perro, Gato)") },
-				leadingIcon = { Icon(Icons.Default.Science, contentDescription = "Especie") },
-				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-				modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
-			)
+			var expanded by remember { mutableStateOf(false) }
+			val especies = listOf("Gato", "Perro", "Conejo", "Iguana", "Vaca", "Tiburon", "Cocodrilo")
 			
-			// Campo: Edad
+			ExposedDropdownMenuBox(
+				expanded = expanded,
+				onExpandedChange = { expanded = !expanded },
+				modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
+			) {
+				OutlinedTextField(
+					value = viewModel.especieMascotaInput,
+					onValueChange = {},
+					readOnly = true,
+					label = { Text("Especie") },
+					leadingIcon = { Icon(Icons.Default.Science, contentDescription = "Especie") },
+					trailingIcon = {
+						ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+					},
+					modifier = Modifier.menuAnchor().fillMaxWidth()
+				)
+				ExposedDropdownMenu(
+					expanded = expanded,
+					onDismissRequest = { expanded = false }
+				) {
+					especies.forEach { especie ->
+						DropdownMenuItem(
+							text = { Text(especie) },
+							onClick = {
+								viewModel.onEspecieMascotaChange(especie)
+								expanded = false
+							}
+						)
+					}
+				}
+			}
+			
 			OutlinedTextField(
 				value = viewModel.edadMascotaInput,
 				onValueChange = viewModel::onEdadMascotaChange,
@@ -99,7 +143,6 @@ fun MascotaScreen(
 				modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
 			)
 			
-			// Campo: Peso (Usando Double para precisión)
 			OutlinedTextField(
 				value = viewModel.pesoMascotaInput,
 				onValueChange = viewModel::onPesoMascotaChange,
@@ -111,17 +154,15 @@ fun MascotaScreen(
 					if (error != null) {
 						Text(text = error, color = MaterialTheme.colorScheme.error)
 					} else {
-						Text("Ej: 2.5 (El peso es crucial para la dosis).")
+						Text("Ej: 2.5")
 					}
 				},
-				// Usamos NumberDecimal para permitir el punto decimal
 				keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
 				modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
 			)
 			
 			Spacer(modifier = Modifier.height(32.dp))
 			
-			// Botón Siguiente
 			Button(
 				enabled = viewModel.esMascotaValida,
 				onClick = {

@@ -11,6 +11,10 @@ import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,36 +26,57 @@ import com.veterinaria.myapplication.presentation.viewmodel.FarmaciaViewModel
 import java.text.NumberFormat
 import java.util.Locale
 
-/*
- * Pantalla para capturar la selección del Medicamento (Flujo Farmacia, Paso 2).
- * Lista los medicamentos disponibles y muestra los cálculos de descuento en tiempo real.
- *
- * @param onNextClick Función de navegación a la siguiente pantalla (ResumenFarmacia).
- * @param onBackClick Función de navegación para volver a la pantalla de Cliente.
- * @param viewModel La instancia de FarmaciaViewModel.
- */
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MedicamentoScreen(
 	onNextClick: () -> Unit,
 	onBackClick: () -> Unit,
+	onOpenDrawer: () -> Unit,
 	viewModel: FarmaciaViewModel = viewModel()
 ) {
+	var showMenu by remember { mutableStateOf(false) }
 	val medicamentos = viewModel.getMedicamentosDisponibles()
 	val seleccionado = viewModel.medicamentoSeleccionado
 	val precioFinal = viewModel.precioFinal
 	
-	// Formateador de moneda (ejemplo de Chile, usa el que prefieras)
 	val currencyFormat = NumberFormat.getCurrencyInstance(Locale("es", "CL"))
 	
 	Scaffold(
 		topBar = {
 			TopAppBar(
-				title = { Text("Farmacia: Elegir Medicamento") },
+				title = { Text("Farmacia", fontWeight = FontWeight(700)) },
 				navigationIcon = {
-					IconButton(onClick = onBackClick) {
-						Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+					IconButton(onClick = onOpenDrawer) {
+						Icon(Icons.Default.Menu, contentDescription = "Abrir Menú")
+					}
+				},
+
+//				navigationIcon = {
+//					IconButton(onClick = onBackClick) {
+//						Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+//					}
+//				},
+				actions = {
+					
+					IconButton(onClick = { showMenu = true }) {
+						Icon(Icons.Default.MoreVert, contentDescription = "Menú contextual")
+					}
+					DropdownMenu(
+						expanded = showMenu,
+						onDismissRequest = { showMenu = false }
+					) {
+						DropdownMenuItem(
+							text = { Text("Iniciar sesión") },
+							onClick = {
+								showMenu = false
+							}
+						)
+						DropdownMenuItem(
+							text = { Text("Configuración") },
+							onClick = {
+								showMenu = false
+							}
+						)
 					}
 				}
 			)
@@ -65,13 +90,12 @@ fun MedicamentoScreen(
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
 			Text(
-				text = "Selecciona el producto y revisa el descuento aplicado.",
+				text = "Selecciona el medicamento.",
 				style = MaterialTheme.typography.titleMedium,
 				color = MaterialTheme.colorScheme.onSurfaceVariant,
 				modifier = Modifier.padding(bottom = 16.dp)
 			)
 			
-			// --- Lista de Medicamentos ---
 			LazyColumn(
 				modifier = Modifier.weight(1f),
 				verticalArrangement = Arrangement.spacedBy(10.dp)
@@ -85,12 +109,11 @@ fun MedicamentoScreen(
 				}
 			}
 			
-			// --- Resumen de Selección y Descuento (Zona Reactiva) ---
 			if (seleccionado != null) {
 				Card(
 					modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-					colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
-					elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+					colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
+//					elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
 				) {
 					Column(modifier = Modifier.padding(16.dp)) {
 						Text(
@@ -98,16 +121,14 @@ fun MedicamentoScreen(
 							style = MaterialTheme.typography.titleSmall,
 							fontWeight = FontWeight.Bold
 						)
-						Divider(modifier = Modifier.padding(vertical = 4.dp))
+						HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 						
-						// Nombre del Medicamento
 						Text(
 							text = seleccionado.nombre,
 							style = MaterialTheme.typography.headlineSmall,
 							fontWeight = FontWeight.SemiBold
 						)
 						
-						// Información de la Promoción
 						if (viewModel.nombrePromocion != null) {
 							Text(
 								text = "Promoción: ${viewModel.nombrePromocion}",
@@ -125,7 +146,6 @@ fun MedicamentoScreen(
 							)
 						}
 						
-						// Precio Final
 						Spacer(modifier = Modifier.height(8.dp))
 						precioFinal?.let { final ->
 							Text(
@@ -141,7 +161,6 @@ fun MedicamentoScreen(
 			
 			Spacer(modifier = Modifier.height(16.dp))
 			
-			// Botón Finalizar Pedido
 			Button(
 				enabled = seleccionado != null,
 				onClick = {

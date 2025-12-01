@@ -3,43 +3,61 @@ package com.veterinaria.myapplication.presentation.ui
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ArrowForward
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.veterinaria.myapplication.presentation.viewmodel.FarmaciaViewModel
 
-
-/*
- * Pantalla para capturar los datos del Cliente (Flujo Farmacia, Paso 1).
- * Es similar al TutorScreen pero usa el FarmaciaViewModel.
- *
- * @param onNextClick Función de navegación a la siguiente pantalla (MedicamentoScreen).
- * @param onBackClick Función de navegación para volver a la pantalla de Bienvenida.
- * @param viewModel La instancia de FarmaciaViewModel.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClienteScreen(
 	onNextClick: () -> Unit,
 	onBackClick: () -> Unit,
-	viewModel: FarmaciaViewModel = viewModel() // Usamos el FarmaciaViewModel
+	onOpenDrawer: () -> Unit,
+	viewModel: FarmaciaViewModel = viewModel()
 ) {
+	var showMenu by remember { mutableStateOf(false) }
+	
 	Scaffold(
 		topBar = {
 			TopAppBar(
-				title = { Text("Farmacia: Datos del Cliente") },
+				title = { Text("Farmacia", fontWeight = FontWeight(700)) },
 				navigationIcon = {
-					IconButton(onClick = onBackClick) {
-						Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+					IconButton(onClick = onOpenDrawer) {
+						Icon(Icons.Default.Menu, contentDescription = "Abrir Menú")
+					}
+				},
+				actions = {
+					IconButton(onClick = { showMenu = true }) {
+						Icon(Icons.Default.MoreVert, contentDescription = "Menú contextual")
+					}
+					DropdownMenu(
+						expanded = showMenu,
+						onDismissRequest = { showMenu = false }
+					) {
+						DropdownMenuItem(
+							text = { Text("Iniciar sesión") },
+							onClick = {
+								showMenu = false
+							}
+						)
+						DropdownMenuItem(
+							text = { Text("Configuración") },
+							onClick = {
+								showMenu = false
+							}
+						)
 					}
 				}
 			)
@@ -53,13 +71,12 @@ fun ClienteScreen(
 			horizontalAlignment = Alignment.CenterHorizontally
 		) {
 			Text(
-				text = "Ingresa los datos del cliente para el pedido.",
+				text = "Ingresa los datos del cliente.",
 				style = MaterialTheme.typography.titleMedium,
 				color = MaterialTheme.colorScheme.onSurfaceVariant,
 				modifier = Modifier.padding(bottom = 24.dp)
 			)
 			
-			// Campo: Nombre del Cliente
 			OutlinedTextField(
 				value = viewModel.nombreClienteInput,
 				onValueChange = viewModel::onNombreClienteChange,
@@ -69,7 +86,6 @@ fun ClienteScreen(
 				modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
 			)
 			
-			// Campo: Teléfono de Contacto (Requerido: 12 dígitos puros)
 			OutlinedTextField(
 				value = viewModel.telefonoClienteInput,
 				onValueChange = viewModel::onTelefonoClienteChange,
@@ -88,7 +104,6 @@ fun ClienteScreen(
 				modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)
 			)
 			
-			// Campo: Correo Electrónico (Requerido: Formato válido)
 			OutlinedTextField(
 				value = viewModel.emailClienteInput,
 				onValueChange = viewModel::onEmailClienteChange,
@@ -109,7 +124,6 @@ fun ClienteScreen(
 			
 			Spacer(modifier = Modifier.height(32.dp))
 			
-			// Botón Siguiente: Habilitado solo si el ViewModel confirma la validez
 			Button(
 				enabled = viewModel.esClienteValido,
 				onClick = {
